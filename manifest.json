@@ -1,0 +1,30 @@
+{
+    "name": "Kazuma Kiryu Typing Extension",
+    "version": "0.0.1",
+    "description": "shows kiryu when typing in the search abr",
+    "manifest_version": 3,
+    "author": "dsinkerii",
+    "permissions": [
+        "activeTab",
+        "tabs"
+    ],
+    "web_accessible_resources": [
+        {
+          "resources": [
+            "videos/kiryu/kiryu-idle.mp4",
+            "videos/kiryu/kiryu-typing-left.mp4",
+            "videos/kiryu/kiryu-typing-right.mp4",
+            "videos/kiryu/kiryu-success.mp4",
+            "videos/text/successwithblur.webm"
+        ],
+          "matches": ["<all_urls>"]
+        }
+      ],
+    "content_scripts": [
+        {
+          "matches": ["https://www.google.com/search*", "http://127.0.0.1:8888/search*"],
+          "js": ["script.js"],
+          "run_at": "document_end"
+        }
+      ]
+}
