@@ -24,3 +24,8 @@ due to the fact that i physically CANNOT upload it manually to the google web st
 
 5. Set the unpacked folder
 6. tadaaa, now uncle kaz can help you search the web.
+
+# Controls:
+- press any key to make kiryu type
+- press enter to trigger the "SUCCESS!!" text
+- press alt+f4 for an easteregg
