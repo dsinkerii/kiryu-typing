@@ -7,7 +7,7 @@ this extension adds kazuma kiryu to your favourite browsing engine to assist you
 due to the fact that i physically CANNOT upload it manually to the google web store, you can either download it manually or if you have firefox, just follow the link
 
 # Firefox installation:
-`ADDON CURRENTLY UNDER REVIEW, PLEASE WAIT FOR MOZILLA TO REVIEW THIS ADDON`
+https://addons.mozilla.org/addon/kazuma-kiryu-typing-extension/
 # Chrome/Chromium/Opera GX installation:
 1. Go into the releases
 2. Download the latest kiryu`{VERSION}`.zip file and extract it
