@@ -30,5 +30,10 @@
           "js": ["script.js"],
           "run_at": "document_end"
         }
-      ]
+      ],
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "{f33bec41-f4e8-42d0-860b-3ef1c897d292}"
+      }
+    }
 }

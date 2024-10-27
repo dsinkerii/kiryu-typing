@@ -37,46 +37,45 @@ newDiv.innerHTML = `
 <style>
     
 #kiryu {
-    position: ` + (currentURL == 'https://www.google.com/'|| currentURL == 'https://search.brave.com/' ? "absolute" : "fixed") + `;
-    margin: ` + (currentURL.includes("http://127.0.0.1:8888/search") == true
-    ? "200px" 
-    : currentURL == 'https://www.google.com/' 
-        ? "25%" 
-        : "-50px") + `;
-    top: `+ (currentURL.includes("http://127.0.0.1:8888/search") == true
-    ? "-185px" 
-    : currentURL == 'https://www.google.com/'
-        ? "-100%" 
-        : currentURL == 'https://search.brave.com/' 
-            ? "35%"
-            : "75px") + `;
+    position: relative;
+    top: -50px;
+    left: -50px;
+    overflow: visible;
     background-color: #505052;
-    ` + (currentURL == 'https://search.brave.com/' ? "left: 50%;" : "\n") + `
+    z-index: 10000000;
+}
+video {
+    overflow: visible;
 }
 </style>
 `;
 
-if(currentURL == 'https://www.google.com/'){
+//nahhhhhhh
+/*if(currentURL == 'https://www.google.com/'){
     var logoElement = document.getElementsByTagName("body")[0].getElementsByTagName("div")[16].getElementsByTagName("div")[0];
     logoElement.getElementsByTagName("img")[0].style.filter = "opacity(0%)";
     var Kiryuoff = document.createElement("kiryuOffset");
     Kiryuoff.appendChild(newDiv);
     logoElement.appendChild(Kiryuoff);
-}
-else if(currentURL.includes("www.google.com/search")){
-    var logoElement = document.getElementById("logo");
+}*/
+if (currentURL.includes("www.google.com/search")) {
+    var logoElement = document.getElementById("logo").parentNode;
     logoElement.appendChild(newDiv);
-}else if(currentURL.includes("http://127.0.0.1:8888/search")){ // in case you use searxng like me
+
+    var topbar = document.getElementById("searchform").childNodes[0];
+    topbar.style = "margin-top: 0px;height: 99px;"
+
+    var main = document.getElementById("main");
+    main.style = "padding-top: 20px;"
+
+    //var searchbar = document.getElementById("logo").parentNode.parentNode.childNodes[1]; // should work for now i hope
+    //searchbar.style = "top:20px"
+}/*else if(currentURL.includes("http://127.0.0.1:8888/search")){ // in case you use searxng like me
     var logoElement = document.getElementById("search_header");
     logoElement.appendChild(newDiv);
-}
-else if(currentURL == "https://search.brave.com/"){
-    var logoElement = document.getElementById("logo");
-    logoElement.getElementsByTagName("img")[0].style.filter = "opacity(0%)";
-    logoElement.appendChild(newDiv);
-}
-else if(currentURL.includes("search.brave.com/search")){
-    var logoElement = document.getElementsByClassName("nav-logo btn btn-link svelte-1og62gc")[0];
+}*/
+else if (currentURL.includes("yandex.ru/search")) {
+    var logoElement = document.getElementsByClassName("HeaderLogo HeaderDesktop-Logo")[0]; // wow ok
     logoElement.appendChild(newDiv);
 }
 //key presses
@@ -91,11 +90,11 @@ const delay = (delayInms) => {
     return new Promise(resolve => setTimeout(resolve, delayInms));
 };
 var isPlaying = false;
-
 var typing = false;
+let typingCooldown = null;
 
 async function Success(event) {
-    if(!isPlaying){
+    if (!isPlaying) {
         isPlaying = true;
         curVidSuccess.style.filter = "opacity(100%)";
         curVidTextSuccess.style.filter = "opacity(100%)";
@@ -113,50 +112,53 @@ async function Success(event) {
 }
 
 async function f(event) {
-    if(!isPlaying){
+    if (!isPlaying) {
         isPlaying = true;
-        if(Math.floor(Math.random() * 2) == 0){
-            curVidLeft.style.filter = "opacity(100%)";
-            curVidLeft.currentTime = '0';
-            curVidLeft.play();
-            await delay(240);
-            curVidLeft.pause();
-            curVidLeft.style.filter = "opacity(0%)";
-        }else{
-            curVidRight.style.filter = "opacity(100%)";
-            curVidRight.currentTime = '0';
-            curVidRight.play();
-            await delay(240);
-            curVidRight.pause();
-            curVidRight.style.filter = "opacity(0%)";
+        clearTimeout(typingCooldown);
+        
+        try {
+            if (Math.floor(Math.random() * 2) == 0) {
+                curVidLeft.style.filter = "opacity(100%)";
+                curVidLeft.currentTime = '0';
+                await curVidLeft.play();
+                await delay(240);
+                curVidLeft.pause();
+                curVidLeft.style.filter = "opacity(0%)";
+                typing = false;
+            } else {
+                curVidRight.style.filter = "opacity(100%)";
+                curVidRight.currentTime = '0';
+                await curVidRight.play();
+                await delay(240);
+                curVidRight.pause();
+                curVidRight.style.filter = "opacity(0%)";
+                typing = false;
+            }
+        } catch (error) {
+            console.error("Error in typing animation:", error);
         }
-    isPlaying = false;
-    await delay(750);
-    typing = false;
-    await delay(750);
-    if(!typing){
-        Success(event);
+        
+        isPlaying = false;
+        
+        // Set new cooldown
+        typingCooldown = setTimeout(() => {
+            if (!typing) {
+                Success(event);
+            }
+        }, 1000);
     }
-    }
-  }
-addEventListener("keydown", (event) => {
-    if (event.isComposing || event.which === 229) {
-      return;
-    }
-    if(event.key == "Enter"){
-        Success(event);
+}
 
+window.addEventListener("keydown", (event) => {
+    if (event.isComposing || event.key == "Enter") {
+        Success(event);
+        return;
     }else{
         typing = true;
         f(event);
     }
-    /*
-    curVid.pause();
-    curVid.currentTime = '0';
-    curVid.play();
-    */
+}, true);
 
-
-  });
-
-
+if (!curVid || !curVidLeft || !curVidRight || !curVidSuccess || !curVidTextSuccess) {
+    console.error("One or more video elements not found");
+}
