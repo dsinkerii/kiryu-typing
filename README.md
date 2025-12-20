@@ -5,7 +5,11 @@ this extension adds kazuma kiryu to your favourite browsing engine to assist you
 
 
 due to the fact that i physically CANNOT upload it manually to the google web store, you can either download it manually or if you have firefox, just follow the link
-
+## supported engines:
+- https://www.google.com/
+- https://www.bing.com/
+- https://duckduckgo.com/
+- https://search.brave.com/
 # Firefox installation:
 https://addons.mozilla.org/addon/kazuma-kiryu-typing-extension/
 # Chrome/Chromium/Opera GX installation:
