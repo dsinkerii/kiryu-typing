@@ -1,7 +1,7 @@
 {
     "name": "Kazuma Kiryu Typing Extension",
     "version": "0.0.2",
-    "description": "shows kiryu when typing in the search abr",
+    "description": "shows kiryu when typing in the search bar",
     "manifest_version": 3,
     "author": "dsinkerii",
     "permissions": [
@@ -20,17 +20,16 @@
           "matches": ["<all_urls>"]
         }
       ],
-    "content_scripts": [
-        {
-          "matches": ["https://www.google.com/search*", 
-                      "http://127.0.0.1:8888/search*",
-                      "https://www.google.com/", 
-                      "https://search.brave.com/",
-                      "https://search.brave.com/search*"],
-          "js": ["script.js"],
-          "run_at": "document_end"
-        }
-      ],
+    "content_scripts": [{
+        "matches": [
+            "https://www.google.com/search*",
+            "https://www.bing.com/search*",
+            "https://duckduckgo.com/*",
+            "https://search.brave.com/*"
+        ],
+        "js": ["script.js"],
+        "run_at": "document_start"
+    }],
     "browser_specific_settings": {
       "gecko": {
         "id": "{f33bec41-f4e8-42d0-860b-3ef1c897d292}"

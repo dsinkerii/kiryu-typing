@@ -1,4 +1,17 @@
+function padLogoForKiryu(logo) {
+    logo.style.display = "inline-flex";
+    logo.style.alignItems = "center";
+    logo.style.justifyContent = "center";
+
+    logo.style.minWidth = "160px";
+    logo.style.minHeight = "90px";
+
+    logo.style.padding = "10px";
+    logo.style.boxSizing = "border-box";
+}
+
 var newDiv = document.createElement("kiryuDiv");
+newDiv.id = "kiryuDiv";
 
 const extensionId = chrome.runtime.id;
 const videoUrl = chrome.runtime.getURL("videos/kiryu/kiryu-idle.mp4");
@@ -10,7 +23,6 @@ const videoUrlSuccessText = chrome.runtime.getURL("videos/text/successwithblur.w
 var currentURL = window.location.href;
 
 newDiv.innerHTML = `
-<html>
 <div id="kiryu">
     <video width="160" height="90" autoplay loop muted id="typing-video">
         <source src=` + videoUrl + ` type="video/mp4">
@@ -33,15 +45,13 @@ newDiv.innerHTML = `
         Your browser does not support the video tag.
     </video>
 </div>
-</html>
 <style>
-    
 #kiryu {
     position: relative;
     top: -50px;
     left: -50px;
     overflow: visible;
-    background-color: #505052;
+    background-color: #50505200;
     z-index: 10000000;
 }
 video {
@@ -50,56 +60,126 @@ video {
 </style>
 `;
 
-//nahhhhhhh
-/*if(currentURL == 'https://www.google.com/'){
-    var logoElement = document.getElementsByTagName("body")[0].getElementsByTagName("div")[16].getElementsByTagName("div")[0];
-    logoElement.getElementsByTagName("img")[0].style.filter = "opacity(0%)";
-    var Kiryuoff = document.createElement("kiryuOffset");
-    Kiryuoff.appendChild(newDiv);
-    logoElement.appendChild(Kiryuoff);
-}*/
-if (currentURL.includes("www.google.com/search")) {
-    var logoElement = document.getElementById("logo").parentNode;
-    logoElement.appendChild(newDiv);
+let curVid = null;
+let curVidLeft = null;
+let curVidRight = null;
+let curVidSuccess = null;
+let curVidTextSuccess = null;
 
-    var topbar = document.getElementById("searchform").childNodes[0];
-    topbar.style = "margin-top: 0px;height: 99px;"
-
-    var main = document.getElementById("main");
-    main.style = "padding-top: 20px;"
-
-    //var searchbar = document.getElementById("logo").parentNode.parentNode.childNodes[1]; // should work for now i hope
-    //searchbar.style = "top:20px"
-}/*else if(currentURL.includes("http://127.0.0.1:8888/search")){ // in case you use searxng like me
-    var logoElement = document.getElementById("search_header");
-    logoElement.appendChild(newDiv);
-}*/
-else if (currentURL.includes("yandex.ru/search")) {
-    var logoElement = document.getElementsByClassName("HeaderLogo HeaderDesktop-Logo")[0]; // wow ok
-    logoElement.appendChild(newDiv);
+function initVideoRefs() {
+    curVid = document.getElementById("typing-video");
+    curVidLeft = document.getElementById("typing-video-left");
+    curVidRight = document.getElementById("typing-video-right");
+    curVidSuccess = document.getElementById("typing-video-success");
+    curVidTextSuccess = document.getElementById("text-video-success");
 }
-//key presses
 
-const curVid = document.getElementById("typing-video");
-const curVidLeft = document.getElementById("typing-video-left");
-const curVidRight = document.getElementById("typing-video-right");
-const curVidSuccess = document.getElementById("typing-video-success");
-const curVidTextSuccess = document.getElementById("text-video-success");
+function ensureVideoRefs() {
+    if (!curVid || !curVidLeft || !curVidRight || !curVidSuccess || !curVidTextSuccess) {
+        initVideoRefs();
+    }
+    return !!(curVid && curVidLeft && curVidRight && curVidSuccess && curVidTextSuccess);
+}
+
+function getLogoElement() {
+    if (currentURL.includes("www.google.com/search")) {
+        return document.querySelector("div.logo.Ib7Efc") || document.querySelector(".logo");
+    }
+    if (currentURL.includes("duckduckgo.com")) {
+        return document.querySelector("#header-logo-wrapper");
+    }
+    if (currentURL.includes("www.bing.com")) {
+        return document.querySelector("a.b_logoArea");
+    }
+    if (currentURL.includes("search.brave.com")) {
+        return document.querySelector("a.nav-logo");
+    }
+    if (currentURL.includes("http://127.0.0.1:8888/search")) {
+        return document.getElementById("search_header");
+    }
+        return null;
+}
+function placeKiryuOnLogo() {
+    if (document.getElementById("kiryuDiv")) return true;
+
+    const logo = getLogoElement();
+    if (!logo) return false;
+    if (currentURL.includes("duckduckgo.com")) {
+        if (!document.body.dataset.kiryuShifted) {
+            document.body.style.paddingLeft = "30px";
+            document.body.style.boxSizing = "border-box";
+            document.body.dataset.kiryuShifted = "1";
+        }
+        document.getElementsByClassName("site-wrapper")[0].style.overflow = "visible";
+        const ddgLogo = document.querySelector("#header-logo-wrapper");
+        if (ddgLogo) ddgLogo.style.overflow = "visible";
+    }
+
+    const logoPos = window.getComputedStyle(logo).position;
+    if (logoPos === "static") logo.style.position = "relative";
+    padLogoForKiryu(logo);
+
+    let Kiryuoff = document.getElementById("kiryuOffset");
+    if (!Kiryuoff) {
+        Kiryuoff = document.createElement("kiryuOffset");
+        Kiryuoff.id = "kiryuOffset";
+        let offsetX = 50;
+        let offsetY = 50;
+
+        if (currentURL.includes("www.google.com/search")) { offsetX = 16; offsetY = 42; }
+        else if (currentURL.includes("www.bing.com")) { offsetX = 60; offsetY = 50; }
+        else if (currentURL.includes("duckduckgo.com")) { offsetX = 20; offsetY = 50; }
+        else if (currentURL.includes("search.brave.com")) { offsetX = 50; offsetY = 50; }
+
+        Kiryuoff.style.cssText =
+            "position:absolute;" +
+            "left:50%;top:50%;" +
+            "transform:translate(-50%,-50%) translate(" + offsetX + "px," + offsetY + "px);" +
+            "pointer-events:none;" +
+            "z-index:10000000;";
+
+    } else {
+        while (Kiryuoff.firstChild) Kiryuoff.removeChild(Kiryuoff.firstChild);
+    }
+
+    Kiryuoff.appendChild(newDiv);
+    logo.appendChild(Kiryuoff);
+
+    if (currentURL.includes("www.google.com/search")) {
+        var topbar = document.getElementById("searchform")?.childNodes?.[0];
+        if (topbar) topbar.style = "margin-top: 0px;height: 99px;";
+        var main = document.getElementById("main");
+        if (main) main.style = "padding-top: 20px;";
+    }
+
+    initVideoRefs();
+    return true;
+}
+
+setTimeout(placeKiryuOnLogo, 0);
+document.addEventListener("DOMContentLoaded", () => {
+    placeKiryuOnLogo();
+    setTimeout(placeKiryuOnLogo, 250);
+    setTimeout(placeKiryuOnLogo, 1000);
+});
 
 const delay = (delayInms) => {
-    return new Promise(resolve => setTimeout(resolve, delayInms));
+  return new Promise(resolve => setTimeout(resolve, delayInms));
 };
+
 var isPlaying = false;
 var typing = false;
 let typingCooldown = null;
 
 async function Success(event) {
+    if (!ensureVideoRefs()) return;
+
     if (!isPlaying) {
         isPlaying = true;
         curVidSuccess.style.filter = "opacity(100%)";
         curVidTextSuccess.style.filter = "opacity(100%)";
-        curVidSuccess.currentTime = '0';
-        curVidTextSuccess.currentTime = '0';
+        curVidSuccess.currentTime = "0";
+        curVidTextSuccess.currentTime = "0";
         curVidTextSuccess.play();
         curVidSuccess.play();
         await delay(2020);
@@ -112,53 +192,52 @@ async function Success(event) {
 }
 
 async function f(event) {
+    if (!ensureVideoRefs()) return;
+
     if (!isPlaying) {
-        isPlaying = true;
-        clearTimeout(typingCooldown);
-        
-        try {
-            if (Math.floor(Math.random() * 2) == 0) {
-                curVidLeft.style.filter = "opacity(100%)";
-                curVidLeft.currentTime = '0';
-                await curVidLeft.play();
-                await delay(240);
-                curVidLeft.pause();
-                curVidLeft.style.filter = "opacity(0%)";
-                typing = false;
-            } else {
-                curVidRight.style.filter = "opacity(100%)";
-                curVidRight.currentTime = '0';
-                await curVidRight.play();
-                await delay(240);
-                curVidRight.pause();
-                curVidRight.style.filter = "opacity(0%)";
-                typing = false;
-            }
-        } catch (error) {
-            console.error("Error in typing animation:", error);
+    isPlaying = true;
+    clearTimeout(typingCooldown);
+
+    try {
+        if (Math.floor(Math.random() * 2) == 0) {
+            curVidLeft.style.filter = "opacity(100%)";
+            curVidLeft.currentTime = "0";
+            await curVidLeft.play();
+            await delay(240);
+            curVidLeft.pause();
+            curVidLeft.style.filter = "opacity(0%)";
+            typing = false;
+        } else {
+            curVidRight.style.filter = "opacity(100%)";
+            curVidRight.currentTime = "0";
+            await curVidRight.play();
+            await delay(240);
+            curVidRight.pause();
+            curVidRight.style.filter = "opacity(0%)";
+            typing = false;
         }
-        
-        isPlaying = false;
-        
-        // Set new cooldown
-        typingCooldown = setTimeout(() => {
-            if (!typing) {
-                Success(event);
-            }
-        }, 1000);
+    } catch (error) {
+        console.error("Error in typing animation:", error);
+    }
+
+    isPlaying = false;
+
+    typingCooldown = setTimeout(() => {
+        if (!typing) {
+            Success(event);
+        }
+    }, 1000);
     }
 }
 
 window.addEventListener("keydown", (event) => {
+    if (!ensureVideoRefs()) return;
+
     if (event.isComposing || event.key == "Enter") {
         Success(event);
         return;
-    }else{
+    } else {
         typing = true;
         f(event);
     }
 }, true);
-
-if (!curVid || !curVidLeft || !curVidRight || !curVidSuccess || !curVidTextSuccess) {
-    console.error("One or more video elements not found");
-}
